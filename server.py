@@ -21,8 +21,8 @@ def save_db(data):
     json.dump(data, open(DB_FILE, "w"), indent=4)
 
 # ===== LOGIN =====
-USERNAME = "admin"
-PASSWORD = "1234"
+USERNAME = "ayushrajsingh"
+PASSWORD = "ars@#0704"
 
 # ===== LICENSE =====
 def generate_license(user_id, hwid):
@@ -68,6 +68,7 @@ def dashboard():
     if request.method == "POST":
         user = request.form.get("user")
         hwid = request.form.get("hwid")
+        license_key = request.form.get("license")
         action = request.form.get("action")
 
         if action == "generate":
@@ -84,6 +85,8 @@ def dashboard():
             for u in db:
                 if u["user"] == user:
                     u["status"] = "ACTIVE" if action == "enable" else "DISABLED"
+        elif action == "delete":
+            db = [u for u in db if u["license"] != license_key]
 
         save_db(db)
         return redirect("/dashboard")   # ✅ sirf POST ke andar
@@ -134,8 +137,12 @@ def dashboard():
         <td>
             <form method="post">
                 <input type="hidden" name="user" value="{{u.user}}">
+                <input type="hidden" name="license" value="{{u.license}}">
                 <button name="action" value="enable">Enable</button>
                 <button name="action" value="disable">Disable</button>
+                <button name="action" value="delete"
+onclick="return confirm('Delete this user?')"
+style="background:red">Delete</button>
             </form>
         </td>
     </tr>
